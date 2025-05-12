@@ -1,0 +1,23 @@
+[
+    {
+        "id":"1",
+        "title": "A Book",
+        "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg",
+        "description": "This is an awesome book!",
+        "price": "19"
+    },
+    {
+        "id":"2",
+        "title": "Kẻ đẹp trai",
+        "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg",
+        "description": "Woá toẹt zời",
+        "price": "12"
+    },
+    {
+        "id":"3",
+        "title": "New Product",
+        "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg",
+        "description": "description",
+        "price": "13"
+    }
+]

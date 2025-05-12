@@ -1,0 +1,41 @@
+###
+GET http://localhost:5000/ HTTP/1.1
+
+###
+GET http://localhost:5000/admin/products HTTP/1.1
+
+###
+GET http://localhost:5000/admin/product/67d1bc9be1e1412e8ade5f9d HTTP/1.1
+
+###
+POST http://localhost:5000/admin/add-product
+Content-Type: application/json
+
+{
+    "title":"New Product",
+    "imageUrl":"img url",
+    "description":"description",
+    "price":"12"
+}
+
+###
+POST http://localhost:5000/admin/delete-product
+Content-Type: application/json
+
+{
+    "prodId": "67d540adbe4d4e4b9c04442a"
+}
+
+###
+POST http://localhost:5000/admin/edit-product
+Content-Type: application/json
+
+{
+    "prodId": "67d1bc9be1e1412e8ade5f9d",
+    "title": "e title",
+    "price": "2",
+    "imageUrl": "https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg", 
+    "description": "không thành công cũng thành cáo"
+
+}
+
