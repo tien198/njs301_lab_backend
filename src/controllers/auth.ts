@@ -14,7 +14,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         const { email, password } = req.body
         const user = await User.findOne({ email }).lean()
         if (!user)
-            throw new ErrorRes('User or password is not correct!')
+            throw new ErrorRes('Login failed!', 400, { uncredentialed: 'User or password is not correct!' })
         const isValid = await bcrypt.compare(password, user?.password)
         if (isValid) {
             req.session.user = user
@@ -22,7 +22,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             res.status(200).json('log in success !')
         }
         else {
-            throw new ErrorRes('User or password is not correct!')
+            throw new ErrorRes('Login failed!', 400, { uncredentialed: 'User or password is not correct!' })
         }
     } catch (error) {
         next(error)
@@ -34,12 +34,14 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 export async function signup(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, password, confirmPassword } = req.body
-        if (password !== confirmPassword)
-            throw new ErrorRes<IAuthError>('Creating user failed!', 400, { confirmPass: 'confirm password is not same to password' })
 
         const user = await User.findOne({ email }).lean()
+
         if (user)
             throw new ErrorRes<IAuthError>('Creating user failed!', 400, { wasExist: 'user is existed' })
+
+        if (password !== confirmPassword)
+            throw new ErrorRes<IAuthError>('Creating user failed!', 400, { confirmPass: 'confirm password is not same to password' })
 
         const hashed = bcrypt.hashSync(password, 12)
 
