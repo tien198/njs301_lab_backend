@@ -5,6 +5,7 @@ import type IAuthError from '../models/auth/authError.interface.ts'
 import User from '../models/mongooseModels/user.ts'
 import bcrypt from 'bcryptjs'
 import ErrorRes from '../models/errorResponse.ts'
+import { transporter, sendMail } from '../utils/sendMail.ts'
 
 
 
@@ -30,6 +31,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 
 
+
 // req.body = { email, password, confirmPassword }
 export async function signup(req: Request, res: Response, next: NextFunction) {
     try {
@@ -50,6 +52,8 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
         })
         req.session.user = created
         req.session.save()
+        // sendmail is async
+        sendMail('tienvn998@gmail.com', 'Signup successfully!')
         res.status(201).json(created)
 
     } catch (error) {
