@@ -2,10 +2,13 @@ import type { Request, Response, NextFunction } from 'express'
 import type IAuthError from '../models/auth/authError.interface.ts'
 
 
+import crypto from 'crypto'
 import User from '../models/mongooseModels/user.ts'
 import bcrypt from 'bcryptjs'
 import ErrorRes from '../models/errorResponse.ts'
-import { transporter, sendMail } from '../utils/sendMail.ts'
+import { sendMail } from '../utils/sendMail.ts'
+import { resetPassTemplate } from '../utils/mailTemplate.ts'
+import SuccessRes from '../models/successResponse.ts'
 
 
 
@@ -62,6 +65,31 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 }
 
 
+// req.body = { email }
+export async function resetPass(req: Request, res: Response, next: NextFunction) {
+    try {
+        const buffer = crypto.randomBytes(32)
+        const token = buffer.toString('hex')
+        const user = await User.findOne({ email: req.body.email })
+
+        if (!user)
+            throw new ErrorRes('Error when reset password', 404, { infor: 'No account with that email found!' })
+
+        user.resetToken = token
+        user.resetTokenExpiration = new Date(Date.now() + 3600000)
+
+        const created = await user.save()
+
+        res.status(200).json(new SuccessRes('Reset pass token was generated! Please check your email and click the link inside to reset password!'))
+        sendMail(created.email, 'Password reset', '', resetPassTemplate(created.resetToken))
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
 export function testCookie(req: Request, res: Response, next: NextFunction) {
     const user = req.session.user
     if (user)
@@ -70,4 +98,4 @@ export function testCookie(req: Request, res: Response, next: NextFunction) {
         res.status(200).json('unauthorize')
 }
 
-export default { login, signup, testCookie }
+export default { login, signup, resetPass, testCookie }

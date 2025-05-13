@@ -17,6 +17,8 @@ export interface IUserInfor {
     email: string
     password: string
     cart: ICart
+    resetToken: string
+    resetTokenExpiration: Date
 }
 
 export default interface IUser extends Document, IUserInfor {

@@ -1,5 +1,5 @@
-export default interface IErrorRes {
-    message: string
-    status?: number
+import type IRes from "./response.ts";
+
+export default interface IErrorRes extends IRes {
     errors?: object
 }
