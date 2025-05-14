@@ -1,11 +1,13 @@
+const server = 'http://localhost:5000'
+
 export enum Server_URL {
-    base = 'http://localhost:5000',
+    base = server,
     resetPass = '/reset-pass',
-    createNewPass = '/create-new-pass'
+    createResetPassToken = '/create-reset-pass-token'
 }
 
 export enum Server_URL_Absolute {
     base = Server_URL.base,
     resetPass = base + Server_URL.resetPass,
-    createNewPass = base + Server_URL.createNewPass
+    createResetPassToken = base + Server_URL.createResetPassToken
 }

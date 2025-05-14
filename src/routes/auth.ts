@@ -12,10 +12,11 @@ router.post('/login', authCtrl.login)
 router.post('/sign-up', authCtrl.signup)
 
 // req.body = { email }
-router.post(Server_URL.resetPass, authCtrl.resetPass)
+router.post(Server_URL.createResetPassToken, authCtrl.createResetPassToken)
 
 // req.body = {  password, confirmPassword, userId, resetToken }
-router.post(Server_URL.createNewPass, authCtrl.createNewPassword)
+router.post(Server_URL.resetPass, authCtrl.resetPass)
+
 
 router.get('/test-cookie', authCtrl.testCookie)
 

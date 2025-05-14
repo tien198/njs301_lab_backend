@@ -3,4 +3,5 @@ export default interface IAuthError {
     wasExist?: 'user is existed'
     notFoundUser?: 'Not found user'
     tokenInvalid?: 'Reset token invalid'
+    tokenExpired?: 'Reset token expired'
 }

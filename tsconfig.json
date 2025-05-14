@@ -14,6 +14,7 @@
         "allowImportingTsExtensions": true,
         "noEmit": true,
         "verbatimModuleSyntax": true,
+        "noEmitOnError": true,
         // "erasableSyntaxOnly": true
         "plugins": [],
         "forceConsistentCasingInFileNames": true

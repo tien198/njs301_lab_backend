@@ -22,13 +22,14 @@ import authRoutes from './routes/auth.ts';
 // Types
 import type { Request, Response, NextFunction } from 'express'
 import type IErrorRes from './models/interfaces/errorResponse.ts';
+import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
 
 
 const app = express()
 
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: Client_URL_Absolute.base,
     credentials: true
 }))
 app.use(bodyParser.json())
