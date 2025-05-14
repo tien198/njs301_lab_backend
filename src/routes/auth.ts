@@ -1,21 +1,23 @@
 import { Router } from 'express'
 
+
 import authCtrl from '../controllers/auth.ts'
-import { Server_URL } from '../utils/uriEnums/Server_Url.ts'
+import { Server_URL as url } from '../utils/uriEnums/Server_Url.ts'
+import { isEmail } from '../middlewares/inputValidations.ts'
 
 const router = Router()
 
 // req.body = { email, password }
-router.post('/login', authCtrl.login)
+router.post(url.login, authCtrl.login)
 
 // req.body = { email, password, confirmPassword }
-router.post('/sign-up', authCtrl.signup)
+router.post(url.signup, isEmail(), authCtrl.signup)
 
 // req.body = { email }
-router.post(Server_URL.createResetPassToken, authCtrl.createResetPassToken)
+router.post(url.createResetPassToken, authCtrl.createResetPassToken)
 
 // req.body = {  password, confirmPassword, userId, resetToken }
-router.post(Server_URL.resetPass, authCtrl.resetPass)
+router.post(url.resetPass, authCtrl.resetPass)
 
 
 router.get('/test-cookie', authCtrl.testCookie)
