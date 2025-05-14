@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import authCtrl from '../controllers/auth.ts'
+import { Server_URL } from '../utils/uriEnums/Server_Url.ts'
 
 const router = Router()
 
@@ -11,7 +12,10 @@ router.post('/login', authCtrl.login)
 router.post('/sign-up', authCtrl.signup)
 
 // req.body = { email }
-router.post('/reset-pass', authCtrl.resetPass)
+router.post(Server_URL.resetPass, authCtrl.resetPass)
+
+// req.body = {  password, confirmPassword, userId, resetToken }
+router.post(Server_URL.createNewPass, authCtrl.createNewPassword)
 
 router.get('/test-cookie', authCtrl.testCookie)
 

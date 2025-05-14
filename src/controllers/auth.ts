@@ -48,7 +48,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
         if (password !== confirmPassword)
             throw new ErrorRes<IAuthError>('Creating user failed!', 400, { confirmPass: 'confirm password is not same to password' })
 
-        const hashed = bcrypt.hashSync(password, 12)
+        const hashed = bcrypt.hashSync(password, process.env.SALT_LENGTH)
 
         const created = await User.create({
             email: email, password: hashed
@@ -70,18 +70,52 @@ export async function resetPass(req: Request, res: Response, next: NextFunction)
     try {
         const buffer = crypto.randomBytes(32)
         const token = buffer.toString('hex')
-        const user = await User.findOne({ email: req.body.email })
+        const user = await User.findOne({ email: req.body.email }).lean()
 
         if (!user)
             throw new ErrorRes('Error when reset password', 404, { infor: 'No account with that email found!' })
 
-        user.resetToken = token
+        // resetToken include token.userId seperate by a dot notation
+        user.resetToken = token + '.' + String(user._id)
         user.resetTokenExpiration = new Date(Date.now() + 3600000)
 
-        const created = await user.save()
+        const updated = await user.save()
 
         res.status(200).json(new SuccessRes('Reset pass token was generated! Please check your email and click the link inside to reset password!'))
-        sendMail(created.email, 'Password reset', '', resetPassTemplate(created.resetToken))
+        sendMail(updated.email, 'Password reset', '', resetPassTemplate(updated.resetToken!))
+
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+// req.body = {  password, confirmPassword, resetToken }
+type createNewPasswordBody = { password: string, confirmPassword: string, resetToken: string }
+export async function createNewPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { password, confirmPassword, resetToken }: createNewPasswordBody = req.body
+        // resetToken include token.userId seperate by a dot notation
+        const userId = resetToken.split('.')[1]
+        const user = await User.findById(userId).lean()
+
+        if (!user)
+            throw new ErrorRes<IAuthError>('Error when reset password', 404, { notFoundUser: 'Not found user' })
+
+        if (password !== confirmPassword)
+            throw new ErrorRes<IAuthError>('Error when reset password', 404, { confirmPass: 'confirm password is not same to password' })
+
+        if (resetToken !== user.resetToken)
+            throw new ErrorRes<IAuthError>('Error when reset password', 404, { tokenInvalid: 'Reset token invalid' })
+
+        user.password = bcrypt.hashSync(password, process.env.SALT_LENGTH)
+        user.resetToken = undefined
+        user.resetTokenExpiration = undefined
+
+        const updated = await user.save()
+        
+        res.status(200).json(new SuccessRes('Reset pass token was generated! Please check your email and click the link inside to reset password!'))
+        sendMail(updated.email, 'Password was reseted', '', '<h1>Password was reseted!</h1>')
 
     } catch (error) {
         next(error)
@@ -98,4 +132,4 @@ export function testCookie(req: Request, res: Response, next: NextFunction) {
         res.status(200).json('unauthorize')
 }
 
-export default { login, signup, resetPass, testCookie }
+export default { login, signup, resetPass, createNewPassword, testCookie }
