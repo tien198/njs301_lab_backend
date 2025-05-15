@@ -3,7 +3,7 @@ import { Router } from 'express'
 
 import authCtrl from '../controllers/auth.ts'
 import { Server_URL as url } from '../utils/uriEnums/Server_Url.ts'
-import { isEmail } from '../middlewares/inputValidations.ts'
+import { isValidSignup } from '../middlewares/exValidator/authValidator.ts'
 
 const router = Router()
 
@@ -11,7 +11,7 @@ const router = Router()
 router.post(url.login, authCtrl.login)
 
 // req.body = { email, password, confirmPassword }
-router.post(url.signup, isEmail(), authCtrl.signup)
+router.post(url.signup, isValidSignup(), authCtrl.signup)
 
 // req.body = { email }
 router.post(url.createResetPassToken, authCtrl.createResetPassToken)

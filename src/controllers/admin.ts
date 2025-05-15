@@ -2,16 +2,23 @@ import type { Request, Response, NextFunction } from 'express'
 
 
 import { error } from 'console';
+import {validationResult} from 'express-validator'
 import Product from '../models/mongooseModels/product.ts';
 
 
+//  req.body = { title, price, imageUrl, description }
+export async function postAddProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { title, price, imageUrl, description } = req.body
 
-export function postAddProduct(req: Request, res: Response, next: NextFunction) {
-    const { title, price, imageUrl, description } = req.body
-    const prod = new Product({ title, price, imageUrl, description })
-    prod.save()
-        .then(() => res.status(201).send('add-product complete!'))
-        .catch(err => { error(err); res.status(400).send(err) })
+        //_________________________________ continoun !
+        
+        const prod = new Product({ title, price, imageUrl, description })
+        const created = await prod.save()
+        res.status(201).send(`Product was added with id: ${String(created._id)}`)
+    } catch (error) {
+        next(error)
+    }
 }
 
 export function getFindAll(req: Request, res: Response, next: NextFunction) {
@@ -27,6 +34,7 @@ export function getFindById(req: Request, res: Response, next: NextFunction) {
         .catch(err => { error(err); res.status(400).send(err) })
 }
 
+//  req.body = { prodId, title, price, imageUrl, description }
 export async function postEditProduct(req: Request, res: Response, next: NextFunction) {
     const { prodId, title, price, imageUrl, description } = req.body;
 
@@ -46,7 +54,7 @@ export async function postEditProduct(req: Request, res: Response, next: NextFun
 
 
 
-
+//  req.body = { prodId }
 export function postDeleteProduct(req: Request, res: Response, next: NextFunction) {
     const { prodId } = req.body
     Product.findByIdAndDelete(prodId)

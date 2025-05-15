@@ -1,14 +1,20 @@
 import { Router } from 'express'
 
 import adminCtrl from '../controllers/admin.ts'
-import Product from '../models/mongooseModels/product.ts'
+import { isValidProduct } from '../middlewares/exValidator/productValidator.ts'
 
 const router = Router()
 
 router.get('/products', adminCtrl.getFindAll)
 router.get('/product/:prodId', adminCtrl.getFindById)
-router.post('/add-product', adminCtrl.postAddProduct);
-router.post('/edit-product', adminCtrl.postEditProduct);
+
+//  req.body = { title, price, imageUrl, description }
+router.post('/add-product', isValidProduct(), adminCtrl.postAddProduct);
+
+//  req.body = { prodId, title, price, imageUrl, description }
+router.post('/edit-product', isValidProduct(), adminCtrl.postEditProduct);
+
+//  req.body = { prodId }
 router.post('/delete-product', adminCtrl.postDeleteProduct)
 
 export default router
