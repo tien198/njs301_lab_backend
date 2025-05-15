@@ -45,11 +45,11 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 
         const errors = validationResult(req) as Result<FieldValidationError>
         if (!errors.isEmpty()) {
-            const errorObj: Record<string,any> = {}
+            const errorObj: Record<string, any> = {}
             errors.array().forEach(i => {
-                errorObj.msg = i.msg
-                errorObj.path = i.path
+                errorObj[i.path] = i.msg
             })
+            console.log(errors.array())
 
             throw new ErrorRes('Creating user failed!', 422, errorObj)
         }
