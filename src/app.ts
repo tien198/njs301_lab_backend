@@ -21,7 +21,7 @@ import authRoutes from './routes/auth.ts';
 
 // Types
 import type { Request, Response, NextFunction } from 'express'
-import type IErrorRes from './models/interfaces/errorResponse.ts';
+import type IErrorRes from './models/interfaces/response/error/index.ts';
 import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
 
 

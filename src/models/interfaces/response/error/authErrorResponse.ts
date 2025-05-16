@@ -1,0 +1,6 @@
+export default interface IAuthErrorRes{
+    email?: string                 // email relevant error 
+    password?: string              // password relevant error 
+    confirmPassword?: string       // confirmPassword relevant error 
+    creadential?: string           // credential relevant error, exp: "user or pass incorect"
+}

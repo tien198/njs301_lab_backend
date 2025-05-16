@@ -1,12 +1,14 @@
 import type { Request, Response, NextFunction } from 'express'
 import type { FieldValidationError, Result } from 'express-validator'
 import type IAuthError from '../models/auth/authError.interface.ts'
+import type IAuthErrorRes from '../models/interfaces/response/error/authErrorResponse.ts'
 
 
 import crypto from 'crypto'
 import User from '../models/mongooseModels/user.ts'
 import bcrypt from 'bcryptjs'
 import { validationResult } from 'express-validator'
+
 
 import ErrorRes from '../models/errorResponse.ts'
 import { sendMail } from '../utils/sendMail.ts'
@@ -78,6 +80,10 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
 // req.body = { email }
 export async function createResetPassToken(req: Request, res: Response, next: NextFunction) {
     try {
+        const errors = validationResult(req)
+        if (!errors.isEmpty())
+            throw new ErrorRes<IAuthErrorRes>('Fail to create reset pass token', 422, createErrorRes(errors))
+
         const buffer = crypto.randomBytes(32)
         const token = buffer.toString('hex')
         const user = await User.findOne({ email: req.body.email })
@@ -103,18 +109,18 @@ export async function createResetPassToken(req: Request, res: Response, next: Ne
 // req.body = {  password, confirmPassword, resetToken }
 export async function resetPass(req: Request, res: Response, next: NextFunction) {
     try {
+        const errors = validationResult(req)
+        if (!errors.isEmpty())
+            throw new ErrorRes<IAuthErrorRes>('Fail to create reset pass token', 422, createErrorRes(errors))
+
+        // confirmPassword was validated in express-validator middleware
         const { password, confirmPassword, resetToken } = req.body
-        // resetToken include token.userId seperate by a dot notation
+
+        // resetToken include token.userId seperate by a dot notation        
         const userId = resetToken.split('.')[1]
         const user = await User.findById(userId)
 
-        if (!user)
-            throw new ErrorRes<IAuthError>('Error when reset password', 422, { credential: 'Reset token invalid' })
-
-        if (password !== confirmPassword)
-            throw new ErrorRes<IAuthError>('Error when reset password', 422, { confirmPassword: 'confirm password is not same to password' })
-
-        if (resetToken !== user.resetToken)
+        if ((!user) || (resetToken !== user.resetToken))
             throw new ErrorRes<IAuthError>('Error when reset password', 422, { credential: 'Reset token invalid' })
 
         if (Date.now() > user.resetTokenExpiration?.getTime()!)

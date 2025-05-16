@@ -8,7 +8,9 @@ const isFieldValidationError = (error: ValidationError): error is FieldValidatio
 
 
 
-
+/**
+ * create error response in format of interface IAuthErroRes
+ */
 export function createErrorRes<T extends Result<ValidationError> = Result<FieldValidationError>>(errors: T) {
     const errorObj: Record<string, any> = {}
     errors.array().forEach(er => {
