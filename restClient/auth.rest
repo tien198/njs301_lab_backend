@@ -3,7 +3,7 @@ POST http://localhost:5000/sign-up HTTP/1.1
 Content-Type: application/json
 
 {
-    "email": "  tienN23vn.app@app.gmail.com",
+    "email": "  tienN23vn@gmail.com",
     "password": " 123aaa ",
     "confirmPassword": " 123aaa "
 }

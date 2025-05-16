@@ -49,7 +49,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
             errors.array().forEach(i => {
                 errorObj[i.path] = i.msg
             })
-            console.log(errors.array())
+            console.log('_', typeof errors)
 
             throw new ErrorRes('Creating user failed!', 422, errorObj)
         }
