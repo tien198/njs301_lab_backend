@@ -11,6 +11,7 @@ import { validationResult } from 'express-validator'
 import ErrorRes from '../models/errorResponse.ts'
 import { sendMail } from '../utils/sendMail.ts'
 import { resetPassTemplate } from '../utils/mailTemplate.ts'
+import { createErrorRes } from '../utils/exValidator/createErrorRes.ts'
 import SuccessRes from '../models/successResponse.ts'
 
 
@@ -19,9 +20,17 @@ import SuccessRes from '../models/successResponse.ts'
 export async function login(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, password } = req.body
+
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            const errorObj = createErrorRes(errors)
+            throw new ErrorRes('Login failed!', 422, errorObj)
+        }
+
         const user = await User.findOne({ email }).lean()
         if (!user)
-            throw new ErrorRes('Login failed!', 400, { uncredentialed: 'User or password is not correct!' })
+            throw new ErrorRes<IAuthError>('Login failed!', 400, { credential: 'User or password is not correct!' })
+
         const isValid = await bcrypt.compare(password, user?.password)
         if (isValid) {
             req.session.user = user
@@ -29,7 +38,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             res.status(200).json(new SuccessRes('login success!'))
         }
         else {
-            throw new ErrorRes('Login failed!', 400, { uncredentialed: 'User or password is not correct!' })
+            throw new ErrorRes<IAuthError>('Login failed!', 400, { credential: 'User or password is not correct!' })
         }
     } catch (error) {
         next(error)
@@ -43,24 +52,11 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
     try {
         const { email, password, confirmPassword } = req.body
 
-        const errors = validationResult(req) as Result<FieldValidationError>
+        const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            const errorObj: Record<string, any> = {}
-            errors.array().forEach(i => {
-                errorObj[i.path] = i.msg
-            })
-            console.log('_', typeof errors)
-
+            const errorObj = createErrorRes(errors)
             throw new ErrorRes('Creating user failed!', 422, errorObj)
         }
-
-        const user = await User.findOne({ email }).lean()
-
-        if (user)
-            throw new ErrorRes<IAuthError>('Creating user failed!', 422, { wasExist: 'user is existed' })
-
-        if (password !== confirmPassword)
-            throw new ErrorRes<IAuthError>('Creating user failed!', 422, { confirmPass: 'confirm password is not same to password' })
 
         const hashed = bcrypt.hashSync(password, +process.env.SALT_LENGTH!)
 
@@ -113,16 +109,16 @@ export async function resetPass(req: Request, res: Response, next: NextFunction)
         const user = await User.findById(userId)
 
         if (!user)
-            throw new ErrorRes<IAuthError>('Error when reset password', 404, { notFoundUser: 'Not found user' })
+            throw new ErrorRes<IAuthError>('Error when reset password', 422, { credential: 'Reset token invalid' })
 
         if (password !== confirmPassword)
-            throw new ErrorRes<IAuthError>('Error when reset password', 404, { confirmPass: 'confirm password is not same to password' })
+            throw new ErrorRes<IAuthError>('Error when reset password', 422, { confirmPassword: 'confirm password is not same to password' })
 
         if (resetToken !== user.resetToken)
-            throw new ErrorRes<IAuthError>('Error when reset password', 404, { tokenInvalid: 'Reset token invalid' })
+            throw new ErrorRes<IAuthError>('Error when reset password', 422, { credential: 'Reset token invalid' })
 
         if (Date.now() > user.resetTokenExpiration?.getTime()!)
-            throw new ErrorRes<IAuthError>('Error when reset password', 404, { tokenExpired: 'Reset token expired' })
+            throw new ErrorRes<IAuthError>('Error when reset password', 422, { credential: 'Reset token expired' })
 
         user.password = bcrypt.hashSync(password, +process.env.SALT_LENGTH!)
         user.resetToken = undefined

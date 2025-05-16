@@ -55,6 +55,9 @@ app.use((error: IErrorRes, req: Request, res: Response, nex: NextFunction) => {
     error.status = error.status ?? 500
     error.cause = error.cause
 
+    console.error(error)
+
+
     res.status(500).json(error)
 })
 
