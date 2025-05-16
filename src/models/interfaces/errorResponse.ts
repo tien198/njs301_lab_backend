@@ -1,5 +1,3 @@
 import type IRes from "./response.ts";
 
-export default interface IErrorRes extends IRes {
-    errors?: object
-}
+export default interface IErrorRes extends IRes, Error { }

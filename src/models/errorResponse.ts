@@ -1,9 +1,11 @@
 import type IErrorRes from "./interfaces/errorResponse.ts";
 
-export default class ErrorRes<T extends object> implements IErrorRes {
+export default class ErrorRes<T extends object> extends Error implements IErrorRes {
     constructor(
-        public message: string,
+        message: string,
         public status?: number,
-        public errors?: T
-    ) { }
+        public cause?: T
+    ) {
+        super(message)
+    }
 }

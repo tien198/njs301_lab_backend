@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from 'express'
 
 
 import { error } from 'console';
-import {validationResult} from 'express-validator'
 import Product from '../models/mongooseModels/product.ts';
 
 

@@ -50,13 +50,12 @@ app.use('/', shopRoutes)
 app.use('/admin', adminRoutes)
 
 
-app.use((error: Error & IErrorRes, req: Request, res: Response, nex: NextFunction) => {
-    const errorRes: IErrorRes = {
-        message: error.message ?? 'Server Internal Error!',
-        status: error.status ?? 500,
-        errors: error.errors
-    }
-    res.status(500).json(errorRes)
+app.use((error: IErrorRes, req: Request, res: Response, nex: NextFunction) => {
+    error.message = error.message ?? 'Server Internal Error!'
+    error.status = error.status ?? 500
+    error.cause = error.cause
+
+    res.status(500).json(error)
 })
 
 
