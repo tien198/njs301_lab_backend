@@ -1,15 +1,18 @@
 import mongoose, { Schema } from 'mongoose'
 import _ from 'lodash'
 
+
+import type { HydratedDocument } from 'mongoose'
+import type { IProduct } from '../interfaces/base/product.ts'
+import type { IUser } from '../interfaces/base/user.ts'
+import type { IUserMethod, UserModel } from '../interfaces/mongoose/user.ts'
+
+
 import Order from './order.ts'
 
-import type { Model } from 'mongoose'
-import type IProduct from '../interfaces/product.ts'
-import type IUser from '../interfaces/user.ts'
 
 
-
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema<IUser, UserModel, IUserMethod>({
     name: String,
     email: { type: String, require: true },
     password: { type: String, required: true },
@@ -34,7 +37,7 @@ const userSchema = new Schema<IUser>({
                 .then(user => user.cart)
         },
 
-        addToCart(prod: IProduct, quantity: number) {
+        addToCart(prod: HydratedDocument<IProduct>, quantity: number) {
             const cart = this.cart
             const item = cart.items?.find(i => {
                 if (!i.product)
@@ -51,6 +54,7 @@ const userSchema = new Schema<IUser>({
                         quantity: +quantity
                     }
                 ]
+
             cart.total += (+prod.price * +quantity)
             return this.updateOne({ cart: cart })
         },
@@ -75,10 +79,11 @@ const userSchema = new Schema<IUser>({
 
         getOrders() {
             return Order.find({ 'user._id': this._id })
+                .then(orders => orders)
         }
     }
 })
 
-const User: Model<IUser> = mongoose.model<IUser>('User', userSchema)
+const User = mongoose.model('User', userSchema)
 
 export default User

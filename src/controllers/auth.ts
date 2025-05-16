@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import type { FieldValidationError, Result } from 'express-validator'
-import type IAuthError from '../models/auth/authError.interface.ts'
+import type IAuthError from '../models/interfaces/response/error/authErrorResponse.ts'
 import type IAuthErrorRes from '../models/interfaces/response/error/authErrorResponse.ts'
 
 

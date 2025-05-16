@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 
 
-import { error } from 'console';
 import Product from '../models/mongooseModels/product.ts';
 
 
@@ -11,7 +10,7 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
         const { title, price, imageUrl, description } = req.body
 
         //_________________________________ continoun !
-        
+
         const prod = new Product({ title, price, imageUrl, description })
         const created = await prod.save()
         res.status(201).send(`Product was added with id: ${String(created._id)}`)
@@ -23,14 +22,14 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
 export function getFindAll(req: Request, res: Response, next: NextFunction) {
     Product.find()
         .then(prods => res.status(200).send(prods))
-        .catch(err => { error(err); res.status(400).send(err) })
+        .catch(error => { console.error(error); res.status(400).send(error) })
 }
 
 export function getFindById(req: Request, res: Response, next: NextFunction) {
     const { prodId } = req.params
     Product.findById(prodId)
         .then(prod => res.send(prod))
-        .catch(err => { error(err); res.status(400).send(err) })
+        .catch(error => { console.error(error); res.status(400).send(error) })
 }
 
 //  req.body = { prodId, title, price, imageUrl, description }
@@ -45,9 +44,9 @@ export async function postEditProduct(req: Request, res: Response, next: NextFun
     try {
         await Product.findByIdAndUpdate(prodId, { title, price, imageUrl, description });
         res.status(200).send(`updated successfully, product with id: '${prodId}'`);
-    } catch (err) {
-        error(err);
-        res.status(400).send(err);
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error);
     }
 }
 
@@ -73,7 +72,7 @@ export function postDeleteProduct(req: Request, res: Response, next: NextFunctio
 
             return res.status(404).send(result)
         })
-        .catch(err => { error(err); res.status(400).send(err) })
+        .catch(error => { console.error(error); res.status(400).send(error) })
 }
 
 

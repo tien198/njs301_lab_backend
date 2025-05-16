@@ -1,12 +1,13 @@
-import mongoose, { Model } from 'mongoose'
+import mongoose from 'mongoose'
 const { Schema } = mongoose
 
 import Product from './product.ts'
 
-import type IOrder from '../interfaces/order.ts'
+import type { IOrder } from '../interfaces/base/order.ts'
+import type { IOrderMethod, OrderModel } from '../interfaces/mongoose/order.ts'
 
 
-const orderSchema = new Schema<IOrder>({
+const orderSchema = new Schema<IOrder, OrderModel, IOrderMethod>({
     items: [
         {
             product: {
@@ -24,6 +25,6 @@ const orderSchema = new Schema<IOrder>({
     }
 })
 
-const Order = mongoose.model<IOrder>('Order', orderSchema)
+const Order = mongoose.model('Order', orderSchema)
 
 export default Order

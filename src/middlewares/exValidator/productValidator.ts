@@ -4,6 +4,7 @@ import { check, body } from 'express-validator'
 export const isValidProduct = () => [
     body('prodId')
         .trim(),
+
     body('title')
         .trim()
         .isAlphanumeric()
@@ -12,9 +13,11 @@ export const isValidProduct = () => [
     body('price')
         .trim()
         .isNumeric(),
+
     body('imageUrl')
         .trim()
         .isURL(),
+
     body('description')
         .trim()
         .isLength({ min: 5 })
