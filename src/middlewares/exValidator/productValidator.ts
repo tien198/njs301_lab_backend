@@ -10,6 +10,7 @@ export const isValidProduct = () => [
         .isAlphanumeric()
         .isLength({ min: 3 })
         .withMessage('Title should contain special character and at least 3 characters'),
+
     body('price')
         .trim()
         .isNumeric(),

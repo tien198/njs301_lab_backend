@@ -1,19 +1,29 @@
 import type { Request, Response, NextFunction } from 'express'
 
+import type IProdErrorRes from '../models/interfaces/response/error/prodErrorResponse.ts';
+
 
 import Product from '../models/mongooseModels/product.ts';
+import { validationResult } from 'express-validator';
+import ErrorRes from '../models/errorResponse.ts';
+import { createErrorRes } from '../utils/exValidator/createErrorRes.ts';
+import SuccessRes from '../models/successResponse.ts';
 
 
 //  req.body = { title, price, imageUrl, description }
 export async function postAddProduct(req: Request, res: Response, next: NextFunction) {
     try {
-        const { title, price, imageUrl, description } = req.body
+        const errors = validationResult(req)
+        if (!errors.isEmpty())
+            throw new ErrorRes<IProdErrorRes>('Product \'field input error', 422, createErrorRes(errors))
 
-        //_________________________________ continoun !
+        const { title, price, imageUrl, description } = req.body
 
         const prod = new Product({ title, price, imageUrl, description })
         const created = await prod.save()
-        res.status(201).send(`Product was added with id: ${String(created._id)}`)
+
+        res.status(201).json(new SuccessRes(`Product was added with id: ${String(created._id)}`))
+
     } catch (error) {
         next(error)
     }
@@ -34,19 +44,21 @@ export function getFindById(req: Request, res: Response, next: NextFunction) {
 
 //  req.body = { prodId, title, price, imageUrl, description }
 export async function postEditProduct(req: Request, res: Response, next: NextFunction) {
-    const { prodId, title, price, imageUrl, description } = req.body;
-
-    if (!prodId) {
-        res.status(400).send(`'/admin/edit-product' request require 'prodId' property!`);
-        return
-    }
-
     try {
+        const errors = validationResult(req)
+        if (!errors.isEmpty())
+            throw new ErrorRes<IProdErrorRes>('Product \'field input error', 422, createErrorRes(errors))
+
+        const { prodId, title, price, imageUrl, description } = req.body;
+
+        if (!prodId)
+            throw new ErrorRes<IProdErrorRes>('Edit product failed', 422, { prodId: 'request require \'prodId\' property!' })
+
         await Product.findByIdAndUpdate(prodId, { title, price, imageUrl, description });
-        res.status(200).send(`updated successfully, product with id: '${prodId}'`);
+        res.status(200).json(new SuccessRes(`Product with id: ${prodId} was eddited`))
+
     } catch (error) {
-        console.error(error);
-        res.status(400).send(error);
+        next(error)
     }
 }
 

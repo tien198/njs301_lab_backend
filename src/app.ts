@@ -22,7 +22,10 @@ import authRoutes from './routes/auth.ts';
 // Types
 import type { Request, Response, NextFunction } from 'express'
 import type IErrorRes from './models/interfaces/response/error/index.ts';
+
+// enums
 import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
+import { Server_URL } from './utils/uriEnums/Server_Url.ts';
 
 
 const app = express()
@@ -45,18 +48,18 @@ app.use(session)
 
 
 
-app.use(authRoutes)
-app.use('/', shopRoutes)
-app.use('/admin', adminRoutes)
+app.use(authRoutes, shopRoutes)
+
+app.use(Server_URL.admin, adminRoutes)
 
 
 app.use((error: IErrorRes, req: Request, res: Response, nex: NextFunction) => {
     error.message = error.message ?? 'Server Internal Error!'
+    error.name = error.name ?? 'Server Internal Error!'
     error.status = error.status ?? 500
     error.cause = error.cause
 
     console.error(error)
-
 
     res.status(500).json(error)
 })
