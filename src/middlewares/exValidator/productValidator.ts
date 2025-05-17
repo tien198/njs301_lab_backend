@@ -7,19 +7,21 @@ export const isValidProduct = () => [
 
     body('title')
         .trim()
-        .isAlphanumeric()
-        .isLength({ min: 3 })
-        .withMessage('Title should contain special character and at least 3 characters'),
+        .notEmpty().withMessage('Title is required').bail()
+        .isLength({ min: 3 }).withMessage('Title must at least 3 characters'),
 
     body('price')
         .trim()
-        .isNumeric(),
+        .notEmpty().withMessage('Price is required').bail()
+        .isNumeric().withMessage('Price must be a numeric'),
 
     body('imageUrl')
         .trim()
-        .isURL(),
+        .notEmpty().withMessage('ImageUrl is required').bail()
+        .isURL().withMessage('ImageUrl must be an url'),
 
     body('description')
         .trim()
-        .isLength({ min: 5 })
+        .notEmpty().withMessage('Description is required').bail()
+        .isLength({ min: 5 }).withMessage('Description must have at least 5 character')
 ]
