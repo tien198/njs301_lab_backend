@@ -1,7 +1,7 @@
 /**
  * authen error response
  */
-export default interface IAuthErrorRes {
+export default interface IAuthError {
     email?: string                  // email relevant error 
     password?: string               // password relevant error 
     confirmPassword?: string        // confirmPassword relevant error 

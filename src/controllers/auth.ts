@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import type IAuthError from '../models/interfaces/response/error/authErrorResponse.ts'
-import type IAuthErrorRes from '../models/interfaces/response/error/authErrorResponse.ts'
+import type IAuthError from '../models/interfaces/response/error/authError.ts'
 
 
 import crypto from 'crypto'
@@ -81,7 +80,7 @@ export async function createResetPassToken(req: Request, res: Response, next: Ne
     try {
         const errors = validationResult(req)
         if (!errors.isEmpty())
-            throw new ErrorRes<IAuthErrorRes>('Fail to create reset pass token', 422, createErrorRes(errors))
+            throw new ErrorRes<IAuthError>('Fail to create reset pass token', 422, createErrorRes(errors))
 
         const buffer = crypto.randomBytes(32)
         const token = buffer.toString('hex')
@@ -110,7 +109,7 @@ export async function resetPass(req: Request, res: Response, next: NextFunction)
     try {
         const errors = validationResult(req)
         if (!errors.isEmpty())
-            throw new ErrorRes<IAuthErrorRes>('Fail to create reset pass token', 422, createErrorRes(errors))
+            throw new ErrorRes<IAuthError>('Fail to create reset pass token', 422, createErrorRes(errors))
 
         // confirmPassword was validated in express-validator middleware
         const { password, confirmPassword, resetToken } = req.body

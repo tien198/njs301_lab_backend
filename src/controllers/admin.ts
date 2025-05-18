@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 
-import type IProdErrorRes from '../models/interfaces/response/error/prodErrorResponse.ts';
+import type IProdError from '../models/interfaces/response/error/prodError.ts';
 
 
 import Product from '../models/mongooseModels/product.ts';
@@ -15,7 +15,7 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
     try {
         const errors = validationResult(req)
         if (!errors.isEmpty())
-            throw new ErrorRes<IProdErrorRes>('Product \'field input error', 422, createErrorRes(errors))
+            throw new ErrorRes<IProdError>('Product \'field input error', 422, createErrorRes(errors))
 
         const { title, price, imageUrl, description } = req.body
 
@@ -29,17 +29,23 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
     }
 }
 
-export function getFindAll(req: Request, res: Response, next: NextFunction) {
-    Product.find()
-        .then(prods => res.status(200).send(prods))
-        .catch(error => { console.error(error); res.status(400).send(error) })
+export async function getFindAll(req: Request, res: Response, next: NextFunction) {
+    try {
+        const prods = await Product.find()
+        res.status(200).send(prods)
+    } catch (error) {
+        next(error)
+    }
 }
 
-export function getFindById(req: Request, res: Response, next: NextFunction) {
-    const { prodId } = req.params
-    Product.findById(prodId)
-        .then(prod => res.send(prod))
-        .catch(error => { console.error(error); res.status(400).send(error) })
+export async function getFindById(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { prodId } = req.params
+        const prod = await Product.findById(prodId)
+        res.status(200).json(prod)
+    } catch (error) {
+        next(error)
+    }
 }
 
 //  req.body = { prodId, title, price, imageUrl, description }
@@ -47,12 +53,12 @@ export async function postEditProduct(req: Request, res: Response, next: NextFun
     try {
         const errors = validationResult(req)
         if (!errors.isEmpty())
-            throw new ErrorRes<IProdErrorRes>('Product \'field input error', 422, createErrorRes(errors))
+            throw new ErrorRes<IProdError>('Product \'field input error', 422, createErrorRes(errors))
 
         const { prodId, title, price, imageUrl, description } = req.body;
 
         if (!prodId)
-            throw new ErrorRes<IProdErrorRes>('Edit product failed', 422, { prodId: 'request require \'prodId\' property!' })
+            throw new ErrorRes<IProdError>('Edit product failed', 422, { prodId: 'request require \'prodId\' property!' })
 
         await Product.findByIdAndUpdate(prodId, { title, price, imageUrl, description });
         res.status(200).json(new SuccessRes(`Product with id: ${prodId} was eddited`))
@@ -65,26 +71,19 @@ export async function postEditProduct(req: Request, res: Response, next: NextFun
 
 
 //  req.body = { prodId }
-export function postDeleteProduct(req: Request, res: Response, next: NextFunction) {
-    const { prodId } = req.body
-    Product.findByIdAndDelete(prodId)
-        // Product.deleteById(prodId)
-        //     .then(deleted => {
-        //         let result = `Product with id: '${prodId}' was deleted`
-        //         if (deleted.deletedCount === 0) {
-        //             result = `Not found product with id: '${prodId}' to delete!`
-        //             return res.status(404).send(result)
-        //         }
-        //         
-        //     })
-        .then(deleted => {
-            let result = `Product with id: '${prodId}' was deleted`
-            if (!deleted)
-                result = `Not found product with id: '${prodId}' to delete!`
+export async function postDeleteProduct(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { prodId } = req.body
+        const deleted = await Product.findByIdAndDelete(prodId)
 
-            return res.status(404).send(result)
-        })
-        .catch(error => { console.error(error); res.status(400).send(error) })
+        if (!deleted)
+            throw new ErrorRes<IProdError>('Delete product failed', 404, { notFound: 'The product you want to delete does not exist' })
+
+        return res.status(200).json(new SuccessRes('Delete success'))
+
+    } catch (error) {
+        next(error)
+    }
 }
 
 
