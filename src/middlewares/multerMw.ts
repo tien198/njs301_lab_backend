@@ -42,4 +42,4 @@ export const multerImgMw = multer({
 }).single('image')
 
 
-export const multerMw = multer().single('image')
+export const multerNoneMw = multer().none()
