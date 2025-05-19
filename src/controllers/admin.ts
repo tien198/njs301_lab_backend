@@ -10,16 +10,13 @@ import { createErrorRes } from '../utils/exValidator/createErrorRes.ts';
 import SuccessRes from '../models/successResponse.ts';
 
 
-//  req.body = { title, price, imageUrl, description }
+//  req.body = { title, price, image, description }
 export async function postAddProduct(req: Request, res: Response, next: NextFunction) {
     try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty())
-            throw new ErrorRes<IProdError>('Product \'field input error', 422, createErrorRes(errors))
+        const filePath = req.file?.path
+        const { title, price, description } = req.body
 
-        const { title, price, imageUrl, description } = req.body
-
-        const prod = new Product({ title, price, imageUrl, description })
+        const prod = new Product({ title, price, imageUrl: filePath, description })
         const created = await prod.save()
 
         res.status(201).json(new SuccessRes(`Product was added with id: ${String(created._id)}`))
@@ -51,10 +48,6 @@ export async function getFindById(req: Request, res: Response, next: NextFunctio
 //  req.body = { prodId, title, price, imageUrl, description }
 export async function postEditProduct(req: Request, res: Response, next: NextFunction) {
     try {
-        const errors = validationResult(req)
-        if (!errors.isEmpty())
-            throw new ErrorRes<IProdError>('Product \'field input error', 422, createErrorRes(errors))
-
         const { prodId, title, price, imageUrl, description } = req.body;
 
         if (!prodId)
@@ -79,7 +72,8 @@ export async function postDeleteProduct(req: Request, res: Response, next: NextF
         if (!deleted)
             throw new ErrorRes<IProdError>('Delete product failed', 404, { notFound: 'The product you want to delete does not exist' })
 
-        return res.status(200).json(new SuccessRes('Delete success'))
+        res.status(200).json(new SuccessRes('Delete success'))
+        return
 
     } catch (error) {
         next(error)

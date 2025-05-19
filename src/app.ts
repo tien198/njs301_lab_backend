@@ -9,6 +9,15 @@ import { error } from 'console';
 import Mongoose from 'mongoose';
 
 
+// Types
+import type { Request, Response, NextFunction } from 'express'
+import type ErrorRes from './models/errorResponse.ts';
+
+// enums
+import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
+import { Server_URL } from './utils/uriEnums/Server_Url.ts';
+
+
 // Middlewares
 import session from './middlewares/session.ts'
 import delayServer from './middlewares/delayServer.ts'
@@ -19,23 +28,16 @@ import adminRoutes from './routes/admin.ts';
 import authRoutes from './routes/auth.ts';
 
 
-// Types
-import type { Request, Response, NextFunction } from 'express'
-import type IErrorRes from './models/interfaces/response/error/index.ts';
-
-// enums
-import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
-import { Server_URL } from './utils/uriEnums/Server_Url.ts';
-
 
 const app = express()
+
+app.use('/public', express.static('public'))
 
 
 app.use(cors({
     origin: Client_URL_Absolute.base,
     credentials: true
 }))
-app.use(bodyParser.json())
 
 
 
@@ -53,7 +55,7 @@ app.use(authRoutes, shopRoutes)
 app.use(Server_URL.admin, adminRoutes)
 
 
-app.use((error: IErrorRes, req: Request, res: Response, nex: NextFunction) => {
+app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
     error.message = error.message ?? 'Server Internal Error!'
     error.name = error.name ?? 'Server Internal Error!'
     error.status = error.status ?? 500
