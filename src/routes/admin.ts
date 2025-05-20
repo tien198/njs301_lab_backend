@@ -4,10 +4,11 @@ import adminCtrl from '../controllers/admin.ts'
 import { isValidProduct, validateProdMw } from '../middlewares/exValidator/productValidator.ts'
 import { Server_URL } from '../utils/uriEnums/Server_Url.ts'
 import { multerImgMw } from '../middlewares/multerMw.ts'
+import { isAuthenMw } from '../middlewares/identityMw.ts'
 
 const router = Router()
 
-router.use(multerImgMw)
+router.use(isAuthenMw, multerImgMw)
 
 router.get(Server_URL.products, adminCtrl.getFindAll)
 

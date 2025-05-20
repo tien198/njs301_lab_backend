@@ -13,7 +13,7 @@ export interface ICart {
 }
 
 export interface IUser {
-    __id: ObjectId
+    _id: ObjectId
     name: string
     email: string
     password: string

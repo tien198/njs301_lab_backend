@@ -1,7 +1,7 @@
 const server = 'http://localhost:5000'
 
 export enum Server_URL {
-    base = server,
+    base = '/',
     login = '/login',
     signup = '/sign-up',
     resetPass = '/reset-pass',
@@ -9,6 +9,11 @@ export enum Server_URL {
 
     products = '/products',
     product = '/product',
+
+    cart = '/cart',
+    addToCart = '/add-to-cart',
+    order = '/orders',
+    addOrder = '/add-order',
 
     admin = '/admin',
     addProduct = '/add-product',
@@ -23,6 +28,9 @@ export enum Server_URL_Absolute {
 
     products = base + Server_URL.products,
     product = base + Server_URL.product,
+
+    cart = base + Server_URL.cart,
+    addToCart = base + Server_URL.addToCart,
 
     admin = base + Server_URL.admin,
     adminProducts = base + Server_URL.admin + Server_URL.products,

@@ -4,9 +4,7 @@ import type IProdError from '../models/interfaces/response/error/prodError.ts';
 
 
 import Product from '../models/mongooseModels/product.ts';
-import { validationResult } from 'express-validator';
 import ErrorRes from '../models/errorResponse.ts';
-import { createErrorRes } from '../utils/exValidator/createErrorRes.ts';
 import SuccessRes from '../models/successResponse.ts';
 
 
@@ -19,7 +17,9 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
         const filePath = req.file?.path
         const { title, price, description } = req.body
 
-        const prod = new Product({ title, price, imageUrl: filePath, description })
+        const userId = req.session.user?._id
+
+        const prod = new Product({ title, price, imageUrl: filePath, description, userId })
         const created = await prod.save()
 
         res.status(201).json(new SuccessRes(`Product was added with id: ${String(created._id)}`))
@@ -31,7 +31,8 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
 
 export async function getFindAll(req: Request, res: Response, next: NextFunction) {
     try {
-        const prods = await Product.find()
+
+        const prods = await Product.find({ userId: req.session.user?._id })
         res.status(200).send(prods)
     } catch (error) {
         next(error)

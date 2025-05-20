@@ -1,14 +1,22 @@
-import { Router } from 'express'
+import express, { Router } from 'express'
 
 import shopCtrl from '../controllers/shop.ts'
+import { Server_URL } from '../utils/uriEnums/Server_Url.ts'
+import { isAuthenMw } from '../middlewares/identityMw.ts'
+
+
 
 const router = Router()
-router.get('/', shopCtrl.getProds)
+router.use(isAuthenMw)
+router.use(express.urlencoded({ extended: false }))
 
-router.get('/cart', shopCtrl.getCart)
-router.post('/cart', shopCtrl.postCart)
 
-router.get('/orders', shopCtrl.getOrders)
-router.post('/order', shopCtrl.postOrder)
+router.get(Server_URL.base, shopCtrl.getProds)
+
+router.get(Server_URL.cart, shopCtrl.getCart)
+router.post(Server_URL.addToCart, shopCtrl.postCart)
+
+router.get(Server_URL.order, shopCtrl.getOrders)
+router.post(Server_URL.addOrder, shopCtrl.postOrder)
 
 export default router

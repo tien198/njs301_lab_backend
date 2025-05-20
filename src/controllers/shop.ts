@@ -6,6 +6,7 @@ import { log, error } from 'console'
 import Product from '../models/mongooseModels/product.ts'
 import ErrorRes from '../models/errorResponse.ts'
 import SuccessRes from '../models/successResponse.ts'
+import User from '../models/mongooseModels/user.ts'
 
 export async function getProds(req: Request, res: Response, next: NextFunction) {
     try {
@@ -18,7 +19,7 @@ export async function getProds(req: Request, res: Response, next: NextFunction) 
 
 export async function getCart(req: Request, res: Response, next: NextFunction) {
     try {
-        const user = req.user
+        const user = await User.findById(req.session.user?._id)
         const cart = await user!.getCart()
         if (!cart)
             throw new ErrorRes<IShopError>('Get cart failed', 404, { notFoundCart: 'Cart haven\'t been initialized, please add to cart to init' })
@@ -33,7 +34,7 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
 export async function postCart(req: Request, res: Response, next: NextFunction) {
     try {
         const { prodId } = req.body
-        const user = req.user
+        const user = await User.findById(req.session.user?._id)
 
         const prod = await Product.findById(prodId)
         if (!prod)

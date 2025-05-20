@@ -8,7 +8,8 @@ const productSchema = new Schema<IProduct>({
     title: { type: String, require: true },
     price: { type: Number, require: true },
     imageUrl: { type: String, require: true },
-    description: { type: String, require: true }
+    description: { type: String, require: true },
+    userId: { type: Schema.Types.ObjectId, require: true }
 })
 
 const Product = mongoose.model('Product', productSchema)

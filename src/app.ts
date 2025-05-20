@@ -19,7 +19,7 @@ import { Server_URL } from './utils/uriEnums/Server_Url.ts';
 
 
 // Middlewares
-import sessionMw from './middlewares/session.ts'
+import sessionMw from './middlewares/sessionMw.ts'
 import delayServer from './middlewares/delayServer.ts'
 
 
@@ -59,7 +59,7 @@ app.use(Server_URL.admin, adminRoutes)
 
 app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
     error.message = error.message ?? 'Server Internal Error!'
-    error.name = error.name ?? 'Server Internal Error!'
+    error.name = error.message ?? 'Server Internal Error!'
     error.status = error.status ?? 500
     error.cause = error.cause
 
@@ -69,12 +69,22 @@ app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
 })
 
 
+import bcrypt from 'bcryptjs'
+import User from './models/mongooseModels/user.ts';
 
 Mongoose.connect(process.env.MONGODB_URI!)
     .then(_ => {
         app.listen(5000)
-    }
-    )
+        return User.findOne({ email: 'admin@gmail.com' })
+    })
+    // check existed and create admin user
+    .then(user => {
+        if (!user) {
+            const hashed = bcrypt.hashSync('123', +process.env.SALT_LENGTH!)
+            user = new User({ email: 'admin@gmail.com', password: hashed, isAdmin: true })
+            return user.save()
+        }
+    })
     .catch(err => error(err))
 
 
