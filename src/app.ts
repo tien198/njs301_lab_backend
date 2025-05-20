@@ -65,7 +65,7 @@ app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
 
     console.error(error)
 
-    res.status(500).json(error)
+    res.status(error.status).json(error)
 })
 
 

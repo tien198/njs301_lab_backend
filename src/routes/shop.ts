@@ -7,11 +7,15 @@ import { isAuthenMw } from '../middlewares/identityMw.ts'
 
 
 const router = Router()
-router.use(isAuthenMw)
 router.use(express.urlencoded({ extended: false }))
 
 
+
 router.get(Server_URL.base, shopCtrl.getProds)
+
+
+
+router.use(isAuthenMw)
 
 router.get(Server_URL.cart, shopCtrl.getCart)
 router.post(Server_URL.addToCart, shopCtrl.postCart)
