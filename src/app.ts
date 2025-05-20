@@ -1,4 +1,8 @@
 import './.d.ts/requestHandler.d.ts'
+// Types
+import type { Request, Response, NextFunction } from 'express'
+import type ErrorRes from './models/errorResponse.ts';
+
 
 import express from 'express';
 import dotenv from 'dotenv'
@@ -9,17 +13,13 @@ import { error } from 'console';
 import Mongoose from 'mongoose';
 
 
-// Types
-import type { Request, Response, NextFunction } from 'express'
-import type ErrorRes from './models/errorResponse.ts';
-
 // enums
 import { Client_URL_Absolute } from './utils/uriEnums/Client_Url.ts';
 import { Server_URL } from './utils/uriEnums/Server_Url.ts';
 
 
 // Middlewares
-import session from './middlewares/session.ts'
+import sessionMw from './middlewares/session.ts'
 import delayServer from './middlewares/delayServer.ts'
 
 
@@ -48,7 +48,7 @@ app.get('/favicon.ico', (req, res) => { res.status(204).end() })
 
 
 // app.use(delayServer)
-app.use(session)
+app.use(sessionMw)
 
 
 

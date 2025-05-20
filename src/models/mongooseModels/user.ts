@@ -25,11 +25,9 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
                 quantity: { type: Number, default: 1 }
             }
         ],
-        total: {
-            type: Number,
-            default: 0
-        },
-    }
+        total: { type: Number, default: 0 },
+    },
+    isAdmin: { type: Boolean, default: false }
 }, {
     methods: {
         getCart() {

@@ -19,12 +19,12 @@ store.on('error', error => {
     console.error(error)
 })
 
-const midlleware = session({
+const sessionMw = session({
     secret: 'secret key',
     resave: true,
     saveUninitialized: false,
-    
+
     store: store
 })
 
-export default midlleware
+export default sessionMw

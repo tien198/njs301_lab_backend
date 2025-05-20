@@ -20,4 +20,5 @@ export interface IUser {
     cart: ICart
     resetToken?: string
     resetTokenExpiration?: Date
+    isAdmin: boolean
 }
