@@ -7,6 +7,7 @@ import Product from '../models/mongooseModels/product.ts'
 import ErrorRes from '../models/errorResponse.ts'
 import SuccessRes from '../models/successResponse.ts'
 import User from '../models/mongooseModels/user.ts'
+import type IAuthError from '../models/interfaces/response/error/authError.ts'
 
 export async function getProds(req: Request, res: Response, next: NextFunction) {
     try {
@@ -19,7 +20,10 @@ export async function getProds(req: Request, res: Response, next: NextFunction) 
 
 export async function getCart(req: Request, res: Response, next: NextFunction) {
     try {
-        const user = await User.findById(req.session.user?._id)
+        const user = await User.findById(req.session.user?._id.toString())
+        if (!user)
+            throw new ErrorRes<IAuthError>('Get cart failed', 403, { credential: 'Not permision. please login' })
+
         const cart = await user!.getCart()
         if (!cart)
             throw new ErrorRes<IShopError>('Get cart failed', 404, { notFoundCart: 'Cart haven\'t been initialized, please add to cart to init' })
