@@ -1,13 +1,15 @@
 import type { Request, Response, NextFunction } from 'express'
 import type IShopError from '../models/interfaces/response/error/shopError.ts'
+import type IAuthError from '../models/interfaces/response/error/authError.ts'
 
-import { log, error } from 'console'
+
 
 import Product from '../models/mongooseModels/product.ts'
 import ErrorRes from '../models/errorResponse.ts'
 import SuccessRes from '../models/successResponse.ts'
 import User from '../models/mongooseModels/user.ts'
-import type IAuthError from '../models/interfaces/response/error/authError.ts'
+
+
 
 export async function getProds(req: Request, res: Response, next: NextFunction) {
     try {
@@ -66,9 +68,10 @@ export async function getOrders(req: Request, res: Response, next: NextFunction)
     }
 }
 
+// userId is found in session
 export async function postOrder(req: Request, res: Response, next: NextFunction) {
     try {
-        const user = req.user
+        const user = await User.findOne(req.session.user?._id)
         await user!.addOrder()
 
         res.status(200).json(new SuccessRes(`Add order successfully! cart'll be reseted!`))

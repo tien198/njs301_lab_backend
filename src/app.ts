@@ -58,14 +58,18 @@ app.use(Server_URL.admin, adminRoutes)
 
 
 app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
-    error.message = error.message ?? 'Server Internal Error!'
-    error.name = error.message ?? 'Server Internal Error!'
-    error.status = error.status ?? 500
-    error.cause = error.cause
+    const status = error.status ?? 500
+    const message = status === 500 ? 'Server Internal Error!' : error.message ?? 'Unknown error'
+    const name = status === 500 ? 'Server Internal Error!' : error.name ?? 'Error'
 
-    console.error(error)
+    const safeError = {
+        status,
+        message,
+        name,
+        cause: error.cause
+    }
 
-    res.status(error.status).json(error)
+    res.status(status).json(error)
 })
 
 
