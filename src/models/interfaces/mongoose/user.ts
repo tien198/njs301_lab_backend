@@ -1,4 +1,4 @@
-import type { HydratedDocument, Model } from 'mongoose'
+import type { FlatRecord, HydratedDocument, Model } from 'mongoose'
 
 import type { IOrder } from '../base/order.ts'
 import type { IProduct } from '../base/product.ts'

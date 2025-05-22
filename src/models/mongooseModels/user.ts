@@ -6,10 +6,10 @@ import type { HydratedDocument } from 'mongoose'
 import type { IProduct } from '../interfaces/base/product.ts'
 import type { IUser } from '../interfaces/base/user.ts'
 import type { IUserMethod, UserModel } from '../interfaces/mongoose/user.ts'
+import type { IOrderItem } from '../interfaces/base/order.ts'
 
 
 import Order from './order.ts'
-import type { IOrder } from '../interfaces/base/order.ts'
 
 
 
@@ -31,9 +31,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
     isAdmin: { type: Boolean, default: false }
 }, {
     methods: {
-        getCart() {
-            return this.populate('cart.items.productRef')
-                .then(user => user.cart)
+        async getCart() {
+            return (await this.populate('cart.items.productRef')).cart
         },
 
         addToCart(prod: HydratedDocument<IProduct>, quantity: number) {
@@ -58,19 +57,20 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
             return this.updateOne({ cart: cart })
         },
 
-        addOrder() {
-            return this.getCart()
-                .then(cart => {
-                    return Order.create({
-                        items: cart.items,
-                        total: cart.total,
-                        userRef: this._id,
-                    })
-                })
-                .then(_ => {
-                    this.cart = { items: [], total: 0 }
-                    return this.save()
-                })
+        async addOrder() {
+            const cart = await this.getCart()
+            const items: IOrderItem[] = cart.items.map(i => ({
+                quantity: i.quantity,
+                product: { ...(i.productRef as any).toObject() }
+            }))
+
+            await Order.create({
+                items: items,
+                total: cart.total,
+                userRef: this._id,
+            })
+            this.cart = { items: [], total: 0 }
+            return this.save()
         },
 
         async getOrders() {

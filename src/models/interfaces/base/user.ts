@@ -1,9 +1,11 @@
 import type { ObjectId } from 'mongodb'
+import type { Document, HydratedDocument } from 'mongoose'
+import type { IProduct } from './product.ts'
 
 
 
 export interface ICartItem {
-    productRef: ObjectId
+    productRef: ObjectId | HydratedDocument<IProduct>
     quantity: number
 }
 

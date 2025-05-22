@@ -13,6 +13,8 @@ router.use(express.urlencoded({ extended: false }))
 
 router.get(Server_URL.base, shopCtrl.getProds)
 
+// param = { prodId:string }
+router.get(Server_URL.product + '/:prodId', shopCtrl.getProdById)
 
 
 router.use(isAuthenMw)

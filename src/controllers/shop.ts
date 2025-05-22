@@ -20,6 +20,17 @@ export async function getProds(req: Request, res: Response, next: NextFunction) 
     }
 }
 
+// param = { prodId:string }
+export async function getProdById(req: Request, res: Response, next: NextFunction) {
+    try {
+        const { prodId } = req.params
+        const prods = await Product.findOne({ _id: prodId }).lean()
+        res.status(200).json(prods)
+    } catch (error) {
+        next(error)
+    }
+}
+
 export async function getCart(req: Request, res: Response, next: NextFunction) {
     try {
         const user = await User.findById(req.session.user?._id.toString())
@@ -83,5 +94,5 @@ export async function postOrder(req: Request, res: Response, next: NextFunction)
 
 
 export default {
-    getProds, getCart, postCart, getOrders, postOrder
+    getProds, getProdById, getCart, postCart, getOrders, postOrder
 }

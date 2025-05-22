@@ -6,6 +6,7 @@ import type IProdError from '../models/interfaces/response/error/prodError.ts';
 import Product from '../models/mongooseModels/product.ts';
 import ErrorRes from '../models/errorResponse.ts';
 import SuccessRes from '../models/successResponse.ts';
+import User from '../models/mongooseModels/user.ts';
 
 
 //  req.body = { title, price, image: BinaryData, description }
@@ -42,7 +43,11 @@ export async function getFindAll(req: Request, res: Response, next: NextFunction
 export async function getFindById(req: Request, res: Response, next: NextFunction) {
     try {
         const { prodId } = req.params
+        const owner = await User.findOne({ _id: req.session.user?._id }).lean()
         const prod = await Product.findById(prodId)
+        if (owner?._id !== prod?.userRef)
+            throw new ErrorRes<IProdError>('Not found', 404, { notFound: 'The resourse is not available' })
+
         res.status(200).json(prod)
     } catch (error) {
         next(error)
