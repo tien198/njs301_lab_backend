@@ -18,6 +18,8 @@ const orderSchema = new Schema<IOrder, OrderModel, IOrderMethod>({
         }
     ],
     total: Number,
+    invoiceUrl: String,
+    invoiceName: String,
 
     userRef: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 })

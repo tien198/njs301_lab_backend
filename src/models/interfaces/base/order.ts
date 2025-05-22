@@ -10,5 +10,7 @@ export interface IOrder {
     _id: ObjectId
     items: IOrderItem[]
     total: number
+    invoiceUrl: string
+    invoiceName: string
     userRef: ObjectId
 }

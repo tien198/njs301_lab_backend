@@ -25,4 +25,6 @@ router.post(Server_URL.addToCart, shopCtrl.postCart)
 router.get(Server_URL.order, shopCtrl.getOrders)
 router.post(Server_URL.addOrder, shopCtrl.postOrder)
 
+router.post(Server_URL.getInvoice, shopCtrl.getInvoice)
+
 export default router

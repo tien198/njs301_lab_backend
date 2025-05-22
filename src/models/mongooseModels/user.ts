@@ -64,13 +64,14 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
                 product: { ...(i.productRef as any).toObject() }
             }))
 
-            await Order.create({
+            const newOrder = await Order.create({
                 items: items,
                 total: cart.total,
                 userRef: this._id,
             })
             this.cart = { items: [], total: 0 }
-            return this.save()
+            await this.save()
+            return newOrder
         },
 
         async getOrders() {

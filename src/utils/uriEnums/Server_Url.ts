@@ -15,6 +15,8 @@ export enum Server_URL {
     order = '/orders',
     addOrder = '/add-order',
 
+    getInvoice='/get-invoice',
+
     admin = '/admin',
     addProduct = '/add-product',
     editProduct = '/edit-product',
