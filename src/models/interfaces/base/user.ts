@@ -3,7 +3,7 @@ import type { ObjectId } from 'mongodb'
 
 
 export interface ICartItem {
-    product: ObjectId
+    productRef: ObjectId
     quantity: number
 }
 

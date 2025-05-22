@@ -69,7 +69,7 @@ app.use((error: ErrorRes, req: Request, res: Response, nex: NextFunction) => {
         cause: error.cause
     }
 
-    res.status(status).json(error)
+    res.status(status).json(safeError)
 })
 
 

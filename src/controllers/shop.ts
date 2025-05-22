@@ -58,7 +58,7 @@ export async function postCart(req: Request, res: Response, next: NextFunction) 
 
 export async function getOrders(req: Request, res: Response, next: NextFunction) {
     try {
-        const user = req.user
+        const user = await User.findOne({ _id: req.session.user?._id })
         const orders = await user!.getOrders()
 
         res.status(200).json(orders)

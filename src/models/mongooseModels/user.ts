@@ -9,6 +9,7 @@ import type { IUserMethod, UserModel } from '../interfaces/mongoose/user.ts'
 
 
 import Order from './order.ts'
+import type { IOrder } from '../interfaces/base/order.ts'
 
 
 
@@ -21,7 +22,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
     cart: {
         items: [
             {
-                product: { type: Schema.Types.ObjectId, ref: 'Product' },
+                productRef: { type: Schema.Types.ObjectId, ref: 'Product' },
                 quantity: { type: Number, default: 1 }
             }
         ],
@@ -31,16 +32,16 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
 }, {
     methods: {
         getCart() {
-            return this.populate('cart.items.product')
+            return this.populate('cart.items.productRef')
                 .then(user => user.cart)
         },
 
         addToCart(prod: HydratedDocument<IProduct>, quantity: number) {
             const cart = this.cart
             const item = cart.items?.find(i => {
-                if (!i.product)
+                if (!i.productRef)
                     return false
-                return i.product.toString() === prod._id.toString()
+                return i.productRef.toString() === prod._id.toString()
             })
             if (item)
                 item.quantity += +quantity
@@ -48,7 +49,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
                 cart.items = [
                     ..._.cloneDeep(this.cart.items),
                     {
-                        product: prod._id,
+                        productRef: prod._id,
                         quantity: +quantity
                     }
                 ]
@@ -63,10 +64,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
                     return Order.create({
                         items: cart.items,
                         total: cart.total,
-                        user: {
-                            _id: this._id,
-                            name: this.name
-                        }
+                        userRef: this._id,
                     })
                 })
                 .then(_ => {
@@ -75,9 +73,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethod>({
                 })
         },
 
-        getOrders() {
-            return Order.find({ 'user._id': this._id })
-                .then(orders => orders)
+        async getOrders() {
+            return await Order.find({ 'userRef': this._id })
         }
     }
 })

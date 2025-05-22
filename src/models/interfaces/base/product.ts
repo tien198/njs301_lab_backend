@@ -6,6 +6,6 @@ export interface IProduct {
     price: number
     imageUrl: string
     description: string
-    userId: ObjectId
+    userRef: ObjectId
 }
 

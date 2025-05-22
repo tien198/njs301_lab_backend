@@ -19,10 +19,7 @@ const orderSchema = new Schema<IOrder, OrderModel, IOrderMethod>({
     ],
     total: Number,
 
-    user: {
-        _id: Schema.Types.ObjectId,
-        name: String
-    }
+    userRef: { type: Schema.Types.ObjectId, ref: 'User', required: true }
 })
 
 const Order = mongoose.model('Order', orderSchema)

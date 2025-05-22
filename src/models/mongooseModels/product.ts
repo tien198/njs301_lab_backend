@@ -9,7 +9,7 @@ const productSchema = new Schema<IProduct>({
     price: { type: Number, require: true },
     imageUrl: { type: String, require: true },
     description: { type: String, require: true },
-    userId: { type: Schema.Types.ObjectId, require: true }
+    userRef: { type: Schema.Types.ObjectId, ref: 'User', require: true }
 })
 
 const Product = mongoose.model('Product', productSchema)
