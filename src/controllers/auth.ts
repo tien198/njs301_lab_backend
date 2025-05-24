@@ -13,6 +13,7 @@ import { sendMail } from '../utils/sendMail.ts'
 import { resetPassTemplate } from '../utils/mailTemplate.ts'
 import { createErrorRes } from '../utils/exValidator/createErrorRes.ts'
 import SuccessRes from '../models/successResponse.ts'
+import type IAuthRes from '../models/interfaces/response/error/authenRes.ts'
 
 
 
@@ -24,21 +25,26 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             const errorObj = createErrorRes(errors)
-            throw new ErrorRes('Login failed!', 422, errorObj)
+            throw new ErrorRes('Login failed', 422, errorObj)
         }
 
         const user = await User.findOne({ email }).lean()
         if (!user)
-            throw new ErrorRes<IAuthError>('Login failed!', 400, { credential: 'User or password is not correct!' })
+            throw new ErrorRes<IAuthError>('Login failed', 400, { credential: 'User or password is not correct' })
 
         const isValid = await bcrypt.compare(password, user?.password)
         if (isValid) {
             req.session.user = user
             req.session.save()
-            res.status(200).json(new SuccessRes('login success!'))
+            const { name, email, isAdmin } = user
+            const resUser = {
+                name, email, isAdmin
+            }
+
+            res.status(200).json(new SuccessRes('login success', 200, resUser))
         }
         else {
-            throw new ErrorRes<IAuthError>('Login failed!', 400, { credential: 'User or password is not correct!' })
+            throw new ErrorRes<IAuthError>('Login failed', 400, { credential: 'User or password is not correct' })
         }
     } catch (error) {
         next(error)
@@ -55,7 +61,7 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             const errorObj = createErrorRes(errors)
-            throw new ErrorRes('Creating user failed!', 422, errorObj)
+            throw new ErrorRes('Creating user failed', 422, errorObj)
         }
 
         const hashed = bcrypt.hashSync(password, +process.env.SALT_LENGTH!)
@@ -67,7 +73,11 @@ export async function signup(req: Request, res: Response, next: NextFunction) {
         req.session.save()
         // sendmail is async
         sendMail('tienvn998@gmail.com', 'Signup successfully!')
-        res.status(201).json(created)
+        const { name, isAdmin } = created
+        const resUser = {
+            name, email, isAdmin
+        }
+        res.status(201).json(new SuccessRes('Signup successfully', 200, resUser))
 
     } catch (error) {
         next(error)
@@ -87,7 +97,7 @@ export async function createResetPassToken(req: Request, res: Response, next: Ne
         const user = await User.findOne({ email: req.body.email })
 
         if (!user)
-            throw new ErrorRes('Error when reset password', 404, { infor: 'No account with that email found!' })
+            throw new ErrorRes('Error when reset password', 404, { infor: 'No account with that email found' })
 
         // resetToken include token.userId seperate by a dot notation
         user.resetToken = token + '.' + String(user._id)
@@ -139,6 +149,13 @@ export async function resetPass(req: Request, res: Response, next: NextFunction)
 }
 
 
+export function logout(req: Request, res: Response, next: NextFunction) {
+    req.session.destroy(error =>
+        next(error)
+    )
+    res.status(200).json(new SuccessRes<IAuthRes>('User logout', 200, { credential: 'Logged out' }))
+}
+
 
 export function testCookie(req: Request, res: Response, next: NextFunction) {
     const user = req.session.user
@@ -148,4 +165,4 @@ export function testCookie(req: Request, res: Response, next: NextFunction) {
         res.status(200).json('unauthorize')
 }
 
-export default { login, signup, createResetPassToken, resetPass, testCookie }
+export default { login, signup, createResetPassToken, resetPass, logout, testCookie }

@@ -1,7 +1,9 @@
+import type IAuthRes from "./authenRes.ts"
+
 /**
  * authen error response
  */
-export default interface IAuthError {
+export default interface IAuthError extends IAuthRes {
     email?: string                  // email relevant error 
     password?: string               // password relevant error 
     confirmPassword?: string        // confirmPassword relevant error 

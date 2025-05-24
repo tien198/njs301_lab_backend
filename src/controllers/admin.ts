@@ -3,10 +3,13 @@ import type { Request, Response, NextFunction } from 'express'
 import type IProdError from '../models/interfaces/response/error/prodError.ts';
 
 
+import fs from 'fs'
+
 import Product from '../models/mongooseModels/product.ts';
 import ErrorRes from '../models/errorResponse.ts';
 import SuccessRes from '../models/successResponse.ts';
 import User from '../models/mongooseModels/user.ts';
+import path from 'path';
 
 
 //  req.body = { title, price, image: BinaryData, description }
@@ -81,10 +84,15 @@ export async function postDeleteProduct(req: Request, res: Response, next: NextF
     try {
         const { prodId } = req.body
         const deleted = await Product.findByIdAndDelete(prodId)
-
         if (!deleted)
             throw new ErrorRes<IProdError>('Delete product failed', 404, { notFound: 'The product you want to delete does not exist' })
 
+        const imgPath = deleted?.imageUrl
+        if (fs.existsSync(imgPath))
+            fs.unlink(imgPath, (error) => {
+                console.log(error)
+                console.log(imgPath)
+            })
         res.status(200).json(new SuccessRes('Delete success'))
         return
 

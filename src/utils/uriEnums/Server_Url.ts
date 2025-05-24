@@ -4,6 +4,7 @@ export enum Server_URL {
     base = '/',
     login = '/login',
     signup = '/sign-up',
+    logout = '/logout',
     resetPass = '/reset-pass',
     createResetPassToken = '/create-reset-pass-token',
 
@@ -15,7 +16,7 @@ export enum Server_URL {
     order = '/orders',
     addOrder = '/add-order',
 
-    getInvoice='/get-invoice',
+    getInvoice = '/get-invoice',
 
     admin = '/admin',
     addProduct = '/add-product',
@@ -25,6 +26,9 @@ export enum Server_URL {
 
 export enum Server_URL_Absolute {
     base = server,
+    login = base + Server_URL.login,
+    signup = base + Server_URL.signup,
+    logout = base + Server_URL.logout,
     resetPass = base + Server_URL.resetPass,
     createResetPassToken = base + Server_URL.createResetPassToken,
 

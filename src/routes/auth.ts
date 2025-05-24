@@ -15,7 +15,7 @@ router.use(bodyParser.urlencoded({ extended: false }))
 router.post(url.login, isValidLogin(), authCtrl.login)
 
 // req.body = { email, password, confirmPassword }
-router.post(url.signup,  isValidSignup(), authCtrl.signup)
+router.post(url.signup, isValidSignup(), authCtrl.signup)
 
 // req.body = { email }
 router.post(url.createResetPassToken, isValidEmai(), authCtrl.createResetPassToken)
@@ -23,6 +23,7 @@ router.post(url.createResetPassToken, isValidEmai(), authCtrl.createResetPassTok
 // req.body = {  password, confirmPassword, userId, resetToken }
 router.post(url.resetPass, isValidResetPass(), authCtrl.resetPass)
 
+router.post(url.logout, authCtrl.logout)
 
 router.get('/test-cookie', authCtrl.testCookie)
 
