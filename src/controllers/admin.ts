@@ -20,7 +20,7 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
 
         const userId = req.session.user?._id
 
-        const prod = new Product({ title, price, imageUrl: filePath, description, userId })
+        const prod = new Product({ title, price, imageUrl: filePath, description, userRef: userId })
         const created = await prod.save()
 
         res.status(201).json(new SuccessRes(`Product was added with id: ${String(created._id)}`))
@@ -33,8 +33,8 @@ export async function postAddProduct(req: Request, res: Response, next: NextFunc
 export async function getFindAll(req: Request, res: Response, next: NextFunction) {
     try {
 
-        const prods = await Product.find({ userId: req.session.user?._id })
-        res.status(200).send(prods)
+        const prods = await Product.find({ userRef: req.session.user?._id }).lean()
+        res.status(200).json(prods)
     } catch (error) {
         next(error)
     }
@@ -45,7 +45,7 @@ export async function getFindById(req: Request, res: Response, next: NextFunctio
         const { prodId } = req.params
         const owner = await User.findOne({ _id: req.session.user?._id }).lean()
         const prod = await Product.findById(prodId)
-        if (owner?._id !== prod?.userRef)
+        if (String(owner?._id) !== String(prod?.userRef))
             throw new ErrorRes<IProdError>('Not found', 404, { notFound: 'The resourse is not available' })
 
         res.status(200).json(prod)

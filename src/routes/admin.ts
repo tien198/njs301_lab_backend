@@ -8,11 +8,19 @@ import { isAuthenMw } from '../middlewares/identityMw.ts'
 
 const router = Router()
 
-router.use(isAuthenMw, multerImgMw)
+router.use(isAuthenMw, express.urlencoded({ extended: false }))
 
 router.get(Server_URL.products, adminCtrl.getFindAll)
 
 router.get(Server_URL.product + '/:prodId', adminCtrl.getFindById)
+
+//  req.body = { prodId }
+router.post(Server_URL.deleteProduct, adminCtrl.postDeleteProduct)
+
+
+
+
+router.use(multerImgMw)
 
 //  req.body = { title, price, image: binaryData, description }
 router.post(Server_URL.addProduct, isValidProduct, validateProdMw, adminCtrl.postAddProduct);
@@ -20,7 +28,5 @@ router.post(Server_URL.addProduct, isValidProduct, validateProdMw, adminCtrl.pos
 //  req.body = { prodId, title, price, image: binaryData, description }
 router.post(Server_URL.editProduct, isValidProduct, validateProdMw, adminCtrl.postEditProduct);
 
-//  req.body = { prodId }
-router.post(Server_URL.deleteProduct, adminCtrl.postDeleteProduct)
 
 export default router
