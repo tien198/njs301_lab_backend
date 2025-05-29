@@ -5,6 +5,7 @@ import fs from 'fs'
 
 
 const diskStorage = multer.diskStorage({
+    // destination func defining the folder to save the file
     destination(req, file, cb) {
         const nowTt = Date.now() // timestamp
         const dt = new Date(nowTt) // datetime
@@ -19,6 +20,7 @@ const diskStorage = multer.diskStorage({
 
         cb(null, filePath)
     },
+    // filename func naming the file in saving to fs
     filename(req, file, cb) {
         cb(null, file.originalname)
     }
@@ -28,6 +30,7 @@ const diskStorage = multer.diskStorage({
 /// List of image mimetypes: https://www.iana.org/assignments/media-types/media-types.xhtml#image
 const imgMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
 
+// Request handler in Express
 function fileFilter(req: Request, file: Express.Multer.File, cb: FileFilterCallback) {
     if (imgMimeTypes.includes(file.mimetype))
         cb(null, true)
